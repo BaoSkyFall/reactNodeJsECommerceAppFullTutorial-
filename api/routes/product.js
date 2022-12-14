@@ -6,7 +6,7 @@ const {
 } = require("./verifyToken");
 
 const router = require("express").Router();
-
+const categories = require("../models/Category");
 //CREATE
 
 router.post("/", verifyTokenAndAdmin, async (req, res) => {
@@ -64,19 +64,36 @@ router.get("/", async (req, res) => {
     let products;
 
     if (qNew) {
-      products = await Product.find().sort({ createdAt: -1 }).limit(1);
+      products = await Product.find().populate(
+        {
+          path: 'Category',
+
+          strictPopulate: false
+
+        }).sort({ createdAt: -1 }).limit(1);
     } else if (qCategory) {
       products = await Product.find({
         categories: {
           $in: [qCategory],
         },
+      }).populate({
+        path: 'Category',
+        strictPopulate: false,
+
       });
     } else {
-      products = await Product.find();
+      products = await Product.find().populate(
+        {
+          path: 'Category',
+          strictPopulate: false,
+
+        });
     }
+    console.log('products:', products)
 
     res.status(200).json(products);
   } catch (err) {
+    console.log('err:', err)
     res.status(500).json(err);
   }
 });

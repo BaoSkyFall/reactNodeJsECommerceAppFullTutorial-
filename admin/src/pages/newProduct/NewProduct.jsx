@@ -8,7 +8,9 @@ import {
 } from "firebase/storage";
 import app from "../../firebase";
 import { addProduct } from "../../redux/apiCalls";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getCategories } from "../../redux/apiCalls";
 
 export default function NewProduct() {
   const [inputs, setInputs] = useState({});
@@ -16,13 +18,19 @@ export default function NewProduct() {
   const [cat, setCat] = useState([]);
   const dispatch = useDispatch();
 
+  const categories = useSelector((state) => state.category.categories);
+
+  useEffect(() => {
+    getCategories(dispatch);
+  }, [dispatch]);
+
   const handleChange = (e) => {
     setInputs((prev) => {
       return { ...prev, [e.target.name]: e.target.value };
     });
   };
   const handleCat = (e) => {
-    setCat(e.target.value.split(","));
+    setCat(e.target.value);
   };
 
   const handleClick = (e) => {
@@ -69,6 +77,7 @@ export default function NewProduct() {
   };
 
   return (
+
     <div className="newProduct">
       <h1 className="addProductTitle">New Product</h1>
       <form className="addProductForm">
@@ -109,12 +118,17 @@ export default function NewProduct() {
         </div>
         <div className="addProductItem">
           <label>Categories</label>
-          <input type="text" placeholder="jeans,skirts" onChange={handleCat} />
+          <select onChange={handleCat}>
+            {categories.map((option) => (
+              <option key={option._id} value={option._id}>{option.name}</option>
+            ))}
+          </select>
+
         </div>
         <div className="addProductItem">
           <label>Stock</label>
           <select name="inStock" onChange={handleChange}>
-            <option value="true">Yes</option>
+            <option selected value="true">Yes</option>
             <option value="false">No</option>
           </select>
         </div>
