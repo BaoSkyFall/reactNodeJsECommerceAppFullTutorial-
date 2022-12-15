@@ -82,12 +82,7 @@ router.get("/", async (req, res) => {
 
       });
     } else {
-      products = await Product.find().populate(
-        {
-          path: 'Category',
-          strictPopulate: false,
-
-        });
+      products = await Product.find().populate('categories').populate('category');
     }
     console.log('products:', products)
 
